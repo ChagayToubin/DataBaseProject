@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="DATA\DAL\" />
+    <Folder Include="DATA\Models\" />
+  </ItemGroup>
+
 </Project>
