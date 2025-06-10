@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataBase.DATA.Databace;
+using DataBase.DATA.Models;
 using MySql.Data.MySqlClient;
 
 namespace DataBase.DATA.DAL
@@ -16,16 +17,24 @@ namespace DataBase.DATA.DAL
         
         MySqlConnection Connect = Connection.InitConnection();
         People_DAL people = new People_DAL();
-        public void CreateNewIntel()
+        public void CreateNewIntel(Person reporter, Person target,string text)
+        {
+            Connection.Open(Connect);
+            var conn = Connect;//יצרr את החיבור
+
+            
+
+            var quary = $"INSERT INTO intelreports ( reporter_id,target_id,text )" +
+                   $"VALUES ('{reporter.Id}', '{target.Id}', '{text}')";
+            new MySqlCommand(quary, conn).ExecuteNonQuery();
+            
+
+
+           
+        }
+        public void FindAllReportsBySecretcid()
         {
 
-            if (targetID != -1)
-            {
-                //people.CreateNewTarget();
-                Console.WriteLine();
-            }
-
-            string Target_secretcode = Console.ReadLine();
         }
 
 

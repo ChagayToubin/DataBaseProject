@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using DataBase.DATA.DAL;
 using DataBase.DATA.Databace;
 using DataBase.DATA.Models;
+using Mysqlx.Crud;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace DataBase
 {
@@ -30,7 +32,7 @@ namespace DataBase
                         Console.WriteLine("Dont found the name .\n lets creat new");
 
                         CreateNewReporterM();
-                        
+
                     }
                     Console.WriteLine("Secure connection created!!!!");
 
@@ -43,7 +45,7 @@ namespace DataBase
 
                     break;
                 case "3":
-                    Console.WriteLine();
+                    //FindAllReportsBySecretcid()//מביא את כל הדוחות שיש למדווח על מישהוא
                     break;
 
 
@@ -82,7 +84,7 @@ namespace DataBase
                     Console.WriteLine("enter your secret code");
                     string secretCode = Console.ReadLine();
 
-                    checkSecretsode = people_method.CheckIfExistBySecret_code(secretCode);
+                    checkSecretsode = people_method.CheckIfExistBySecretCode(secretCode);
 
                     break;
                 default:
@@ -102,7 +104,7 @@ namespace DataBase
             string lastname = Console.ReadLine();
             string randomSecretCode = RandomSecretCode();
 
-            people_method.CreateNewReporter(firstname, lastname, randomSecretCode);
+            people_method.CreatPerson(firstname, lastname, randomSecretCode, "reporter");
 
         }
         public void CreateNewTargetM()
@@ -115,22 +117,58 @@ namespace DataBase
             string lastname = Console.ReadLine();
 
             string randomSecretCode = RandomSecretCode();
-            people_method.CreateNewTarget(firstname, lastname, randomSecretCode);
+            people_method.CreatPerson(firstname, lastname, randomSecretCode, "target");
         }
         public void CreateNewIntelM()
         {
+            int targetId;
+            Console.WriteLine("enter your target secret code");
+            string secretcodeTar = Console.ReadLine();
 
-            Console.WriteLine("enter your  secret code ");
-            //int reporterID = people_method.
+            Person target1 = people_method.GetPersonBySecretcode(secretcodeTar);
+            Person target2;
+            if (target1 == null)
+            {
+                Console.WriteLine("secret code desent exisit letes create new taarget ");
+                CreateNewTargetM();
 
-            Console.WriteLine("Enter a report into the system ");
+                Console.WriteLine("enter target secret code ");
+                secretcodeTar = Console.ReadLine();
+
+                target2 = people_method.GetPersonBySecretcode(secretcodeTar);
+
+                target1 = target2;
+
+            }
+
+
+            Console.WriteLine("reporter pleas enter your secret code");
+            string secretCodeRep = Console.ReadLine();
+
+            Person reporter = people_method.GetPersonBySecretcode(secretCodeRep);
+           
+            Console.WriteLine("enter yout informtion");
+
             string TextReport = Console.ReadLine();
 
-            Console.WriteLine("enter your target secret code");
 
-            int targetID = people.GetIdBySecretcode(); //1
+            
+            people_method.UpdatePerson(reporter,"r");
+            people_method.UpdatePerson(target1,"t");
 
-            intel_report.CreateNewIntel();
+            checkAlret(reporter,target1);
+           
+       
+            intel_report.CreateNewIntel(reporter, target1, TextReport);
+        }
+        public void checkAlret(Person reporrter, Person target)
+        {
+
+
+        }
+        public void CheckUpdate()
+        {
+
         }
         public string RandomSecretCode()
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataBase.DATA.Models
 {
-    internal class Person
+    public class Person
     {
         public int Id { get; set; }
 
@@ -25,7 +25,7 @@ namespace DataBase.DATA.Models
         
         public class Builder
         {
-            private readonly Person _person = new Person();
+            private Person _person = new Person();
 
             public Builder SetId(int id)
             {

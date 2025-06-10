@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection.PortableExecutable;
 using System.Text;
@@ -15,8 +16,33 @@ namespace DataBase.DATA.DAL
     {
         MySqlConnection Connect = Connection.InitConnection();
 
+        public void CreatPerson(string firstName, string lastName, string secretCode, string type)
+        {
+            try
+            {
+                Connection.Open(Connect);
+                var conn = Connect;
 
-        public bool CheckIfExistBySecret_code(string secret_code)
+                var quary = $"INSERT INTO People (first_name, last_name, secret_code, type, num_reports, num_mentions)" +
+                    $"VALUES ('{firstName}', '{lastName}', '{secretCode}', '{type}', 0, 0)";
+                new MySqlCommand(quary, conn).ExecuteNonQuery();
+
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("!@#$%^&*(*&^%$#@");
+                throw new Exception(ex.Message);
+
+            }
+            finally
+            {
+                Connection.Close(Connect);
+            }
+
+
+        }
+        public bool CheckIfExistBySecretCode(string secret_code)
         {
             Connection.Open(Connect);
             var conn = Connect;//יצרr את החיבור
@@ -32,8 +58,7 @@ namespace DataBase.DATA.DAL
             }
             catch (Exception ex)
             {
-                //Console.WriteLine("!@#$%^&*(*&^%$#@");
-                throw new Exception(ex.Message);
+                return false;
 
             }
             finally
@@ -72,7 +97,108 @@ namespace DataBase.DATA.DAL
             }
 
         }
-        public void CreateNewReporter(string firstname, string lastname, string randomSecretCode)
+        public Person GetPersonBySecretcode(string secretcode)
+        {
+            Connection.Open(Connect);
+            MySqlCommand cmd = null;
+            MySqlDataReader reader = null;
+            try
+            {
+                cmd = new MySqlCommand($"SELECT * FROM people where secret_code='{secretcode}' ", Connect);
+
+
+                reader = cmd.ExecuteReader();
+                reader.Read();
+
+                int ID = reader.GetInt32("id");
+                string firstName = reader.GetString("first_name");
+                string lastName = reader.GetString("last_name");
+                string secreCode = reader.GetString("secret_code");
+                string type = reader.GetString("type");
+                int namReport = reader.GetInt32("num_reports");
+                int numMentions = reader.GetInt32("num_mentions");
+
+
+                Person a = new Person.Builder().SetFirstName(firstName)
+                .SetId(ID)
+                    .SetLastName(lastName)
+                    .SetSecretCode(secreCode)
+                    .SetType(type)
+                    .SetNumReports(namReport)
+                    .SetNumMentions(numMentions)
+                    .Build();
+
+
+                return a;
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("!@#$%^&*(*&^%$#@");
+                Console.WriteLine("Error: " + ex.Message);
+                Console.WriteLine("dont found");
+                return null;
+
+            }
+            finally
+            {
+                Connection.Close(Connect);
+
+            }
+        }
+        public void UpdatePerson(Person person, string sighn)
+        {
+
+            try
+            {
+                Connection.Open(Connect);
+                var conn = Connect;
+                if (sighn == "r")
+                {
+                    var quary = $"UPDATE people SET num_reports = {person.NumReports + 1} WHERE id={person.Id}";
+                    new MySqlCommand(quary, conn).ExecuteNonQuery();
+                }
+                else
+                {
+                    var quary = $"UPDATE people SET num_mentions = {person.NumMentions + 1} WHERE id={person.Id}";
+                    new MySqlCommand(quary, conn).ExecuteNonQuery();
+
+                }
+
+                
+
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine("!@#$%^&*(*&^%$#@");
+                Console.WriteLine("Error: " + ex.Message);
+
+            }
+            finally
+            {
+                Connection.Close(Connect);
+
+            }
+
+        }
+
+        public string RandomSecretCode()
+        {
+            Random rnd = new Random();
+            string random = "QWERTYUIOP[]ASDFGHJKL;'ZXCVBNM,./zxcvbnmasdfghjkl;'qwertyuiop!@#$%^&*()_+";
+            string RandomleCode = "";
+            for (int i = 0; i < 5; i++)
+            {
+
+                RandomleCode += random[rnd.Next(0, random.Length)];
+            }
+            return RandomleCode;
+        }
+
+
+
+    }
+}
+/*  public void CreateNewReporter(string firstname, string lastname, string randomSecretCode)
         {
             try
             {
@@ -124,73 +250,5 @@ namespace DataBase.DATA.DAL
             {
                 Connection.Close(Connect);
             }
-        }
-
-        public int GetIdBySecretcode()
-        {
-            Connection.Open(Connect);
-            var conn = Connect;//יצרr את החיבור
-
-            MySqlCommand cmd = null;
-            MySqlDataReader reader = null;
-            try
-            {
-
-
-                string secretCode = Console.ReadLine();
-
-                cmd = new MySqlCommand($"SELECT id FROM people WHERE secret_code='{secretCode}'", conn);
-                reader = cmd.ExecuteReader();
-
-                int id = -1;
-
-                if (reader.Read())
-                {
-                    id = Convert.ToInt32(reader["id"]);
-                    Console.WriteLine(id);
-                }
-                else
-                {
-                    Console.WriteLine("No match found try again");
-                    GetIdBySecretcode();
-
-                }
-
-                return id;
-
-            }
-            catch (Exception ex)
-            {
-                //Console.WriteLine("!@#$%^&*(*&^%$#@");
-                Console.WriteLine("Error: " + ex.Message);
-                return -1;
-
-            }
-            finally
-            {
-                Connection.Close(Connect);
-
-            }
-        }
-
-
-
-
-
-        public string RandomSecretCode()
-        {
-            Random rnd = new Random();
-            string random = "QWERTYUIOP[]ASDFGHJKL;'ZXCVBNM,./zxcvbnmasdfghjkl;'qwertyuiop!@#$%^&*()_+";
-            string RandomleCode = "";
-            for (int i = 0; i < 5; i++)
-            {
-
-                RandomleCode += random[rnd.Next(0, random.Length)];
-            }
-            return RandomleCode;
-        }
-
-
-
-    }
-}
+        }\\
+*\/8/*/

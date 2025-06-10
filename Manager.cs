@@ -33,7 +33,9 @@ namespace DataBase
             //people_method.CreateNewReporter();
             //people_method.GetIdBySecretcode();
             //intel_report.CreateNewIntel();
+            //Person a = people_method.GetPersonBySecretcode("A129873");
 
+            //people_method.UpdatePerson(a, "r");
 
 
         }
