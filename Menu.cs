@@ -30,11 +30,11 @@ namespace DataBase
                         Console.WriteLine("Dont found the name .\n lets creat new");
 
                         CreateNewReporterM();
-
+                        
                     }
                     Console.WriteLine("Secure connection created!!!!");
 
-                    //intel_report.CreateNewIntel();
+                    CreateNewIntelM();
                     break;
 
                 case "2":
@@ -116,6 +116,21 @@ namespace DataBase
 
             string randomSecretCode = RandomSecretCode();
             people_method.CreateNewTarget(firstname, lastname, randomSecretCode);
+        }
+        public void CreateNewIntelM()
+        {
+
+            Console.WriteLine("enter your  secret code ");
+            //int reporterID = people_method.
+
+            Console.WriteLine("Enter a report into the system ");
+            string TextReport = Console.ReadLine();
+
+            Console.WriteLine("enter your target secret code");
+
+            int targetID = people.GetIdBySecretcode(); //1
+
+            intel_report.CreateNewIntel();
         }
         public string RandomSecretCode()
         {

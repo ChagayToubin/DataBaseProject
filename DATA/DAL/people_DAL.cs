@@ -26,13 +26,8 @@ namespace DataBase.DATA.DAL
             try
             {
                 cmd = new MySqlCommand($"SELECT * FROM People where secret_code='{secret_code}'", Connect);
-
-
                 reader = cmd.ExecuteReader();
-
                 return (reader.HasRows);
-
-
 
             }
             catch (Exception ex)
@@ -67,7 +62,7 @@ namespace DataBase.DATA.DAL
             catch (Exception ex)
             {
                 //Console.WriteLine("!@#$%^&*(*&^%$#@");
-               
+
                 return false;
 
             }
@@ -108,10 +103,10 @@ namespace DataBase.DATA.DAL
                 Connection.Open(Connect);
                 var conn = Connect;
                 Console.WriteLine("enter his first name");
-              
+
 
                 Console.WriteLine("enter his last name");
-               
+
 
                 var quary = $"INSERT INTO People (first_name, last_name, secret_code, type, num_reports, num_mentions)" +
                     $"VALUES ('{firstname}', '{lastname}', '{randomSecretCode}', 'target', 0, 0)";
