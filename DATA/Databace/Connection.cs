@@ -18,7 +18,7 @@ namespace DataBase.DATA.Databace
             {
                 conn = new MySqlConnection(connStr);
                
-                Console.WriteLine("Connection successful");
+               
             }
             catch (Exception ex)
             {

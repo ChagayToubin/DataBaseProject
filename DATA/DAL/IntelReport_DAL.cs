@@ -29,8 +29,8 @@ namespace DataBase.DATA.DAL
 
             if (targetID != -1)
             {
-                people.CreateNewTarget();
-
+                //people.CreateNewTarget();
+                Console.WriteLine();
             }
 
             string Target_secretcode = Console.ReadLine();

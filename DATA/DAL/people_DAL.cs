@@ -29,9 +29,9 @@ namespace DataBase.DATA.DAL
 
 
                 reader = cmd.ExecuteReader();
-               
+
                 return (reader.HasRows);
-                
+
 
 
             }
@@ -46,21 +46,19 @@ namespace DataBase.DATA.DAL
                 Connection.Close(Connect);
             }
         }
-        public bool CheckIfExistByName(string FirstName,string LastName)
+        public bool CheckIfExistByName(string FirstName, string LastName)
         {
             Connection.Open(Connect);
             var conn = Connect;//יצרr את החיבור
-           
+
             MySqlCommand cmd = null;
             MySqlDataReader reader = null;
             try
             {
                 cmd = new MySqlCommand($"SELECT * FROM People where first_name='" +
                     $"{FirstName}'and last_name={LastName}", Connect);
-              
 
                 reader = cmd.ExecuteReader();
-                
 
                 return (reader.HasRows);
 
@@ -69,33 +67,28 @@ namespace DataBase.DATA.DAL
             catch (Exception ex)
             {
                 //Console.WriteLine("!@#$%^&*(*&^%$#@");
-                throw new Exception(ex.Message);
+               
+                return false;
 
             }
             finally
             {
                 Connection.Close(Connect);
             }
-            
+
         }
-        public void CreateNewReporter()
+        public void CreateNewReporter(string firstname, string lastname, string randomSecretCode)
         {
             try
             {
                 Connection.Open(Connect);
                 var conn = Connect;
-                Console.WriteLine("enter your first name");
-                string firstname = Console.ReadLine();
-                Console.WriteLine("enter your last name");
-                string lastname = Console.ReadLine();
-
-                string randomSecretCode = RandomSecretCode();
 
                 var quary = $"INSERT INTO People (first_name, last_name, secret_code, type, num_reports, num_mentions)" +
                     $"VALUES ('{firstname}', '{lastname}', '{randomSecretCode}', 'reporter', 0, 0)";
                 new MySqlCommand(quary, conn).ExecuteNonQuery();
 
-                Connect.Close();
+
             }
             catch (Exception ex)
             {
@@ -108,19 +101,17 @@ namespace DataBase.DATA.DAL
                 Connection.Close(Connect);
             }
         }
-        public void CreateNewTarget()
+        public void CreateNewTarget(string firstname, string lastname, string randomSecretCode)
         {
             try
             {
                 Connection.Open(Connect);
                 var conn = Connect;
                 Console.WriteLine("enter his first name");
-                string firstname = Console.ReadLine();
+              
 
                 Console.WriteLine("enter his last name");
-                string lastname = Console.ReadLine();
-
-                string randomSecretCode = RandomSecretCode();
+               
 
                 var quary = $"INSERT INTO People (first_name, last_name, secret_code, type, num_reports, num_mentions)" +
                     $"VALUES ('{firstname}', '{lastname}', '{randomSecretCode}', 'target', 0, 0)";
@@ -149,7 +140,7 @@ namespace DataBase.DATA.DAL
             MySqlDataReader reader = null;
             try
             {
-               
+
 
                 string secretCode = Console.ReadLine();
 
@@ -171,7 +162,7 @@ namespace DataBase.DATA.DAL
                 }
 
                 return id;
-                
+
             }
             catch (Exception ex)
             {
@@ -183,10 +174,10 @@ namespace DataBase.DATA.DAL
             finally
             {
                 Connection.Close(Connect);
-               
+
             }
         }
-        
+
 
 
 

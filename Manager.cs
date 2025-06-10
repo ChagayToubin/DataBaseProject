@@ -29,9 +29,9 @@ namespace DataBase
             //Console.WriteLine(rr.Id);
 
             //pp.CheckIfExistByName("eu", "232");
-            //menu.ShowMainMune();
+            menu.ShowMainMune();
             //people_method.CreateNewReporter();
-            people_method.GetIdBySecretcode();
+            //people_method.GetIdBySecretcode();
             //intel_report.CreateNewIntel();
 
 
