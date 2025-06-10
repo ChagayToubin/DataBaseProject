@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataBase.DATA.Models
 {
+    
     public class IntelReport
     {
         public int Id { get; set; }
@@ -19,12 +20,18 @@ namespace DataBase.DATA.Models
         public void PrintReport()
         {
             Console.WriteLine($"ID: {Id}, Reporter: {ReporterId}, Target: {TargetId}, Time: {Timestamp}");
-            Console.WriteLine(Text);
+            PrintRed(Text);
+        }
+        public static void PrintRed(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ResetColor();
         }
 
         public class Builder
         {
-            private readonly IntelReport _report = new IntelReport();
+            private  IntelReport _report = new IntelReport();
 
             public Builder SetId(int id)
             {
@@ -61,4 +68,5 @@ namespace DataBase.DATA.Models
             }
         }
     }
+
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DataBase.DATA.DAL;
 using DataBase.DATA.Databace;
 using DataBase.DATA.Models;
+using Microsoft.VisualBasic;
 using Mysqlx.Crud;
 using Org.BouncyCastle.Asn1.X509;
 
@@ -18,7 +19,8 @@ namespace DataBase
         public void ShowMainMune()
         {
             Console.WriteLine("wellcome entere 1 for entere to the system" +
-                "enter 2 to create new reorter ");
+                "enter 2 to create new reorter " +
+                "enter 3 to see all the intel");
 
 
 
@@ -32,8 +34,10 @@ namespace DataBase
                         Console.WriteLine("Dont found the name .\n lets creat new");
 
                         CreateNewReporterM();
+                        
 
                     }
+                    
                     Console.WriteLine("Secure connection created!!!!");
 
                     CreateNewIntelM();
@@ -45,7 +49,8 @@ namespace DataBase
 
                     break;
                 case "3":
-                    //FindAllReportsBySecretcid()//מביא את כל הדוחות שיש למדווח על מישהוא
+                    FindAllReportsByIDM();
+
                     break;
 
 
@@ -152,24 +157,93 @@ namespace DataBase
             string TextReport = Console.ReadLine();
 
 
-            
-            people_method.UpdatePerson(reporter,"r");
-            people_method.UpdatePerson(target1,"t");
+            Console.WriteLine("---------------");
+            people_method.UpdatePersonReportsOrMention(reporter,"r");
+            people_method.UpdatePersonReportsOrMention(target1,"t");
 
-            checkAlret(reporter,target1);
+            CheckUpdateType(reporter,target1);
            
        
             intel_report.CreateNewIntel(reporter, target1, TextReport);
         }
-        public void checkAlret(Person reporrter, Person target)
+        public void FindAllReportsByIDM()
+        {
+            Console.WriteLine("Press 'r' to check reporter or 't' to check target");
+            string sign = Console.ReadLine();
+
+            Console.WriteLine("Who do want to see enter id ");
+            int IDSerch = int.Parse(Console.ReadLine());
+
+
+            var reports =intel_report.FindAllReportsByID(IDSerch, sign);
+            foreach(var report in reports)
+            {
+                report.PrintReport();
+            }
+        }
+        public void checkAlret(Person reporrter, Person target)//בדיקה של התראות
         {
 
 
         }
-        public void CheckUpdate()
+        public void CheckUpdateType(Person reporter, Person target)//שינוי של טייפ אם צריך בבן אדם
         {
 
+            checkUpdatereporter(reporter);
+            checkUpdateTarget(target);
         }
+        public void checkUpdatereporter(Person reporter)
+        {
+
+            
+            int numberReporterReport = reporter.NumReports + 1;//add 1 beacuse the new intel
+            double avgTextLength = AverageOfText();
+            if (numberReporterReport > 1 || avgTextLength > 100)
+            {
+               
+                people_method.UpdatePersonType(reporter.Id, "potential_agent");
+            }
+            double AverageOfText()
+            {
+                int sum = 0;
+                List<IntelReport> list = intel_report.FindAllReportsByID(reporter.Id, "r");
+                foreach (var report in list)
+                {
+                    sum += report.Text.Replace(" ","").Length;
+                }
+                return sum / list.Count;
+            }
+
+        }
+       
+        public void checkUpdateTarget(Person target)
+        {
+            List<IntelReport> list = intel_report.FindAllReportsByID(target.Id, "t");
+
+            int numOfMention = list.Count;
+            bool timMention = findTimeRisk();
+            if (numOfMention >= 20 ||timMention)
+            {
+               //להפעיל התראה 
+            }
+            
+            bool findTimeRisk()
+            {
+               
+                if (list.Count >= 3) {
+                    bool b = false;
+                    
+                    TimeSpan timeCheck = list[0].Timestamp - list[2].Timestamp;
+                    return timeCheck.TotalMinutes <= 15;
+                }
+
+                return false;
+            }
+
+
+        }
+
+
         public string RandomSecretCode()
         {
             Random rnd = new Random();
@@ -181,6 +255,13 @@ namespace DataBase
                 RandomleCode += random[rnd.Next(0, random.Length)];
             }
             return RandomleCode;
+        }
+
+        public static void PrintRed(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ResetColor();
         }
 
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,14 @@ namespace DataBase
             //Console.WriteLine(rr.Id);
 
             //pp.CheckIfExistByName("eu", "232");
-            menu.ShowMainMune();
+            //menu.ShowMainMune();
+            var d = intel_report.FindAllReportsByID(13, "r");
+
+            foreach (var report in d)
+            {
+                Console.WriteLine($"ID: {report.Id}, Reporter: {report.ReporterId}, Target: {report.TargetId}, Text: \"{report.Text}\", Time: {report.Timestamp:yyyy-MM-dd HH:mm:ss}");
+            }
+
             //people_method.CreateNewReporter();
             //people_method.GetIdBySecretcode();
             //intel_report.CreateNewIntel();
@@ -40,7 +48,7 @@ namespace DataBase
 
         }
 
-       
+
 
     }
 }

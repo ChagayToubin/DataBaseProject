@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DataBase.DATA.Databace;
 using DataBase.DATA.Models;
+using Google.Protobuf.Compiler;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 
@@ -42,6 +43,7 @@ namespace DataBase.DATA.DAL
 
 
         }
+
         public bool CheckIfExistBySecretCode(string secret_code)
         {
             Connection.Open(Connect);
@@ -145,7 +147,7 @@ namespace DataBase.DATA.DAL
 
             }
         }
-        public void UpdatePerson(Person person, string sighn)
+        public void UpdatePersonReportsOrMention(Person person, string sighn)
         {
 
             try
@@ -181,6 +183,30 @@ namespace DataBase.DATA.DAL
 
         }
 
+        public void UpdatePersonType(int personId, string newtype)
+        {
+            try
+            {
+                Connection.Open(Connect);
+                var conn = Connect;
+
+                {
+                    var quary = $"UPDATE people SET type = '{newtype}' WHERE id={personId}";
+                    new MySqlCommand(quary, conn).ExecuteNonQuery();
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+
+            }
+            finally
+            {
+                Connection.Close(Connect);
+            }
+        }
         public string RandomSecretCode()
         {
             Random rnd = new Random();
