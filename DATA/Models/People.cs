@@ -22,6 +22,7 @@ namespace DataBase.DATA.Models
         public int NumReports { get; set; } = 0;
 
         public int NumMentions { get; set; } = 0;
+        
         public class Builder
         {
             private readonly Person _person = new Person();

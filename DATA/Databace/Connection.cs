@@ -4,18 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using Mysqlx.Cursor;
 
 namespace DataBase.DATA.Databace
 {
     public static class Connection
     {
-        public static MySqlConnection openConnection()
+        public static MySqlConnection InitConnection()
         {
             string connStr = "Server=localhost;Database=projectdb;User=root;Password=;Port=3306;";
-            MySqlConnection _conn;
+            MySqlConnection conn;
             try
             {
-                _conn = new MySqlConnection(connStr);
+                conn = new MySqlConnection(connStr);
                
                 Console.WriteLine("Connection successful");
             }
@@ -28,7 +29,15 @@ namespace DataBase.DATA.Databace
 
 
 
-            return _conn;
+            return conn;
+        }
+        public static void Open(MySqlConnection conn)
+        {
+            conn.Open();
+        }
+        public static void Close(MySqlConnection conn)
+        {
+            conn.Close();
         }
     }
 }
