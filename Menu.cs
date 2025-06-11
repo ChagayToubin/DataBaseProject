@@ -8,6 +8,7 @@ using DataBase.DATA.Databace;
 using DataBase.DATA.Models;
 using Microsoft.VisualBasic;
 using Mysqlx.Crud;
+
 using Org.BouncyCastle.Asn1.X509;
 
 namespace DataBase
@@ -18,51 +19,70 @@ namespace DataBase
         public static IntelReport_DAL intel_report = new IntelReport_DAL();
         public void ShowMainMune()
         {
-            Console.WriteLine("wellcome entere 1 for entere to the system" +
-                "enter 2 to create new reorter " +
-                "enter 3 to see all the intel");
+            bool flag = true;
 
 
 
-            switch (Console.ReadLine())//להסויף ןלידציה
+            if (!(EnterCheck())) //אם  קיבל אישור כניסה
             {
-                case "1"://נכנס לפונקציה חמטרת הזדהות כל עוד לא הצליח להיכנס לא יוכל להמשיך הלאה
+                Console.WriteLine("Dont found the name .\n lets creat new");
 
+                CreateNewReporterM();
 
-                    if (!(EnterCheck())) //אם  קיבל אישור כניסה
-                    {
-                        Console.WriteLine("Dont found the name .\n lets creat new");
-
-                        CreateNewReporterM();
-                        
-
-                    }
-                    
-                    Console.WriteLine("Secure connection created!!!!");
-
-                    CreateNewIntelM();
-                    break;
-
-                case "2":
-                    CreateNewReporterM();
-
-
-                    break;
-                case "3":
-                    FindAllReportsByIDM();
-
-                    break;
-
-
-
-                default:
-                    Console.WriteLine("Please enter a valid value or 'q' to exit the system.");
-                    ShowMainMune();
-                    break;
 
             }
+            Console.WriteLine("The secure connection was successful.");
+            while (flag)
+            {
+                Console.WriteLine(" " +
+                    "If u forgot your secret code press 2 \n " +
+                    "To create intel reports prees 3\n " +
+                    "To show intel reports press 4" +
+                    "Log out of the system Press 9");
+                switch (Console.ReadLine())
+                {
 
+                    case "2":
+                        {
+                            string secret = GetSecretCodeBynameM();
+                        }
+                        break;
+                    case "3":
+                        {
+                            CreateNewIntelM();
+                        }
+                        break;
+                    case "4":
+                        {
+                            SowAllData();
+
+                        }
+                        //יצירה של פונקציה שמראה לנו מה שורצה
+                        break;
+                    case "9":
+                        {
+                            flag = false;
+                            break;
+                        }
+                    default:
+                        {
+                            Console.WriteLine("Please enter a valid value or 'q' to exit the system.");
+                            Console.ReadKey();
+                            Console.Clear();
+
+                        }
+                        break;
+
+                        
+                }
+            }
         }
+
+
+
+
+
+
         public bool EnterCheck()
         {
             bool checkName = false;
@@ -100,19 +120,27 @@ namespace DataBase
             return checkSecretsode || checkName;//גישה אושרה אחד מהנתונים תקין
 
         }
-        public void CreateNewReporterM()
+        public void CreateNewReporterM()//2
         {
             Console.WriteLine("Lets create new Repoerter");
             Console.WriteLine("enter your first name");
             string firstname = Console.ReadLine();
             Console.WriteLine("enter your last name");
             string lastname = Console.ReadLine();
-            string randomSecretCode = RandomSecretCode();
+          
+            string randomSecretCode1 = RandomSecretCode();
+            
+           
 
-            people_method.CreatPerson(firstname, lastname, randomSecretCode, "reporter");
+            people_method.CreatPerson(firstname, lastname, randomSecretCode1, "reporter");
+
+            Console.WriteLine("--------------\n");
+            Console.WriteLine("Created successfully \n These are your details, keep them safe");
+            Console.WriteLine($"FirstName: {firstname}\n LastName: {lastname}\n SecretCode: {randomSecretCode1}\n Type: reporter");
+            Console.WriteLine("--------------\n");
 
         }
-        public void CreateNewTargetM()
+        public void CreateNewTargetM()//3
         {
 
             Console.WriteLine("enter his first name");
@@ -123,8 +151,13 @@ namespace DataBase
 
             string randomSecretCode = RandomSecretCode();
             people_method.CreatPerson(firstname, lastname, randomSecretCode, "target");
+
+            Console.WriteLine("--------------\n");
+            Console.WriteLine("Created successfully \n These are your details, keep them safe");
+            Console.WriteLine($"FirstName: {firstname}\n LastName: {lastname}\n SecretCode: {randomSecretCode}\n Type: target");
+            Console.WriteLine("--------------\n");
         }
-        public void CreateNewIntelM()
+        public void CreateNewIntelM()//4
         {
             int targetId;
             Console.WriteLine("enter your target secret code");
@@ -146,27 +179,27 @@ namespace DataBase
 
             }
 
-
-            Console.WriteLine("reporter pleas enter your secret code");
+            
+            Console.WriteLine("reporter pleas enter your secret code to creat report");
             string secretCodeRep = Console.ReadLine();
 
             Person reporter = people_method.GetPersonBySecretcode(secretCodeRep);
-           
+
             Console.WriteLine("enter yout informtion");
 
             string TextReport = Console.ReadLine();
 
 
-            Console.WriteLine("---------------");
-            people_method.UpdatePersonReportsOrMention(reporter,"r");
-            people_method.UpdatePersonReportsOrMention(target1,"t");
 
-            CheckUpdateType(reporter,target1);
-           
-       
+            people_method.UpdatePersonReportsOrMention(reporter, "r");
+            people_method.UpdatePersonReportsOrMention(target1, "t");
+
+            CheckUpdateType(reporter, target1, TextReport);
+
+
             intel_report.CreateNewIntel(reporter, target1, TextReport);
         }
-        public void FindAllReportsByIDM()
+        public void FindAllReportsByIDM()//5
         {
             Console.WriteLine("Press 'r' to check reporter or 't' to check target");
             string sign = Console.ReadLine();
@@ -175,33 +208,40 @@ namespace DataBase
             int IDSerch = int.Parse(Console.ReadLine());
 
 
-            var reports =intel_report.FindAllReportsByID(IDSerch, sign);
-            foreach(var report in reports)
+            var reports = intel_report.FindAllReportsByID(IDSerch, sign);
+            foreach (var report in reports)
             {
                 report.PrintReport();
             }
         }
-        public void checkAlret(Person reporrter, Person target)//בדיקה של התראות
-        {
 
+        public void CheckUpdateType(Person reporter, Person target,string textreport)//6
+        {
+            if (reporter.Id == target.Id)
+            {
+                people_method.UpdatePersonType(reporter.Id, "both", "type");
+
+                people_method.UpdatePersonReportsOrMention(reporter, "r");
+                people_method.UpdatePersonReportsOrMention(target, "t");
+
+            }
+            else
+            {
+                checkUpdatereporter(reporter, textreport);
+                checkUpdateTarget(target);
+            }
 
         }
-        public void CheckUpdateType(Person reporter, Person target)//שינוי של טייפ אם צריך בבן אדם
+        public void checkUpdatereporter(Person reporter,string txt)
         {
 
-            checkUpdatereporter(reporter);
-            checkUpdateTarget(target);
-        }
-        public void checkUpdatereporter(Person reporter)
-        {
 
-            
             int numberReporterReport = reporter.NumReports + 1;//add 1 beacuse the new intel
             double avgTextLength = AverageOfText();
             if (numberReporterReport > 1 || avgTextLength > 100)
             {
-               
-                people_method.UpdatePersonType(reporter.Id, "potential_agent");
+
+                people_method.UpdatePersonType(reporter.Id, "potential_agent", "type");
             }
             double AverageOfText()
             {
@@ -209,30 +249,37 @@ namespace DataBase
                 List<IntelReport> list = intel_report.FindAllReportsByID(reporter.Id, "r");
                 foreach (var report in list)
                 {
-                    sum += report.Text.Replace(" ","").Length;
+                    sum += report.Text.Replace(" ", "").Length;
                 }
-                return sum / list.Count;
+                sum += txt.Length;
+                
+                
+                return sum / (list.Count+1);
             }
 
-        }
-       
-        public void checkUpdateTarget(Person target)
+        }//7
+
+        public void checkUpdateTarget(Person target)//8
         {
             List<IntelReport> list = intel_report.FindAllReportsByID(target.Id, "t");
 
             int numOfMention = list.Count;
             bool timMention = findTimeRisk();
-            if (numOfMention >= 20 ||timMention)
+            if (numOfMention >= 20 || timMention)
             {
-               //להפעיל התראה 
+                //להפעיל התאה 
+                PrintRed($"{target.FirstName} - {target.LastName}  vary danger");
+                //לעדכן עכשיו אותו למסוכן
+                people_method.UpdatePersonType(target.Id, "danger", "type_danger");
             }
-            
+
             bool findTimeRisk()
             {
-               
-                if (list.Count >= 3) {
+
+                if (list.Count >= 3)
+                {
                     bool b = false;
-                    
+
                     TimeSpan timeCheck = list[0].Timestamp - list[2].Timestamp;
                     return timeCheck.TotalMinutes <= 15;
                 }
@@ -242,18 +289,93 @@ namespace DataBase
 
 
         }
+        public string GetSecretCodeBynameM()//9
+        {
+
+            string firstName, lastName, secretcode;
+
+            Console.WriteLine("enter your first name ");
+            firstName = Console.ReadLine();
+
+            Console.WriteLine("enter your last name");
+            lastName = Console.ReadLine();
+
+            secretcode = people_method.GetSecretCodeByname(firstName, lastName);
+            Console.WriteLine(secretcode);
+
+            return secretcode;
+        }
+
+        public void SowAllData()
+        {
+            Console.WriteLine("To see all potential agents press 1");
+            Console.WriteLine("To see all dangerous target press 2");
+            Console.WriteLine("To see all reporter press 3");
+            Console.WriteLine("To see all the danger target press 4");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    ShowIPeopleByTypeM("potential_agent");
+                    break;
+                case "2":
+                    ShowIPeopleByTypeM("target");
+                    break;
+                case "3":
+                    ShowIPeopleByTypeM("reporter");
+                    break;
+                case "4":
+                    ShowIPeopleByTypeM("danger");
+                    break;
+
+                default:
+                    Console.WriteLine("Invalid choice. Please enter 1, 2,  3, 4");
+                    break;
+
+            }
+            void ShowIPeopleByTypeM(string type)
+            {
+                List<Person> people = people_method.ShowIPeopleByType(type);
+
+                if (people == null)
+                {
+                    Console.WriteLine("No bady was found");
+                }
+                else
+                {
+                    foreach (var report in people)
+                    {
+                        report.PrintPersonInfo();
+                        Console.WriteLine("--------------");
+                    }
+                }
+
+            }
+            
+
+        }
+
+
+
+
+
+
+
 
 
         public string RandomSecretCode()
         {
             Random rnd = new Random();
-            string random = "QWERTYUIOP[]ASDFGHJKL;'ZXCVBNM,./zxcvbnmasdfghjkl;'qwertyuiop!@#$%^&*()_+";
+            string random = "123456789qwertyuiop[]sdfghjkl!@#$%^&*";
             string RandomleCode = "";
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 2; i++)
             {
 
                 RandomleCode += random[rnd.Next(0, random.Length)];
             }
+            Console.WriteLine(RandomleCode);
             return RandomleCode;
         }
 

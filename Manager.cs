@@ -30,13 +30,15 @@ namespace DataBase
             //Console.WriteLine(rr.Id);
 
             //pp.CheckIfExistByName("eu", "232");
-            //menu.ShowMainMune();
-            var d = intel_report.FindAllReportsByID(13, "r");
+            //menu.SowAllData();
+            menu.ShowMainMune();
+            //var d = intel_report.FindAllReportsByID(13, "r");
 
-            foreach (var report in d)
-            {
-                Console.WriteLine($"ID: {report.Id}, Reporter: {report.ReporterId}, Target: {report.TargetId}, Text: \"{report.Text}\", Time: {report.Timestamp:yyyy-MM-dd HH:mm:ss}");
-            }
+            //foreach (var report in d)
+            //{
+            //    Console.WriteLine($"ID: {report.Id}, Reporter: {report.ReporterId}, Target: {report.TargetId}, Text: \"{report.Text}\", Time: {report.Timestamp:yyyy-MM-dd HH:mm:ss}");
+            //}
+
 
             //people_method.CreateNewReporter();
             //people_method.GetIdBySecretcode();

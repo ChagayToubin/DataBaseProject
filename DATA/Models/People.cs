@@ -22,7 +22,19 @@ namespace DataBase.DATA.Models
         public int NumReports { get; set; } = 0;
 
         public int NumMentions { get; set; } = 0;
-        
+        public void PrintPersonInfo()
+        {
+            Console.WriteLine($"ID: {this.Id}");
+            Console.WriteLine($"First Name: {this.FirstName}");
+            Console.WriteLine($"Last Name: {this.LastName}");
+            Console.WriteLine($"Secret Code: {this.SecretCode}");
+            Console.WriteLine($"Type: {this.Type}");
+            Console.WriteLine($"Number of Reports: {this.NumReports}");
+            Console.WriteLine($"Number of Mentions: {this.NumMentions}");
+        }
+
+
+
         public class Builder
         {
             private Person _person = new Person();
