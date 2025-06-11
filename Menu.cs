@@ -20,6 +20,7 @@ namespace DataBase
         public void ShowMainMune()
         {
             bool flag = true;
+            Person MainReporter, MainTarget;
 
 
 
@@ -27,17 +28,34 @@ namespace DataBase
             {
                 Console.WriteLine("Dont found the name .\n lets creat new");
 
-                CreateNewReporterM();
-
+                MainReporter = CreateNewReporterM();
 
             }
+            else
+            {
+                Console.ReadKey();
+                Console.Clear();
+
+                Console.WriteLine("The secure connection almost done  to make sure its u pleas enter your secret code again ");
+                string secret = Console.ReadLine();
+                MainReporter = people_method.GetPersonBySecretcode(secret);
+                if (MainReporter == null)
+                {
+                    Console.WriteLine("dont found ");
+                    ShowMainMune();
+                }
+                Console.WriteLine(MainReporter.Id);
+            }
+
+
+
             Console.WriteLine("The secure connection was successful.");
             while (flag)
             {
                 Console.WriteLine(" " +
                     "If u forgot your secret code press 2 \n " +
                     "To create intel reports prees 3\n " +
-                    "To show intel reports press 4" +
+                    "To show intel reports press 4\n" +
                     "Log out of the system Press 9");
                 switch (Console.ReadLine())
                 {
@@ -49,7 +67,7 @@ namespace DataBase
                         break;
                     case "3":
                         {
-                            CreateNewIntelM();
+                            CreateNewIntelM(MainReporter);
                         }
                         break;
                     case "4":
@@ -72,11 +90,11 @@ namespace DataBase
 
                         }
                         break;
-
-                        
                 }
+
             }
         }
+
 
 
 
@@ -85,62 +103,46 @@ namespace DataBase
 
         public bool EnterCheck()
         {
-            bool checkName = false;
+
             bool checkSecretsode = false;
 
 
-            Console.WriteLine("Identification system Click 1 to identify yourself using your name\n" +
-                " 2 for identify yourself using your a secret code");
-            switch (Console.ReadLine())
-            {
+            Console.WriteLine("Identification system \n" +
+                "To identify yourself using your  secret code");
 
-                case "1":
+            Console.WriteLine("enter your secret code");
+            string secretCode = Console.ReadLine();
 
-                    Console.WriteLine("enter your first name");
-                    string firstname = Console.ReadLine();
+            checkSecretsode = people_method.CheckIfExistBySecretCode(secretCode);
 
-                    Console.WriteLine("enter your last name");
-                    string lastname = Console.ReadLine();
 
-                    checkName = people_method.CheckIfExistByName(firstname, lastname);
-
-                    break;
-                case "2":
-                    Console.WriteLine("enter your secret code");
-                    string secretCode = Console.ReadLine();
-
-                    checkSecretsode = people_method.CheckIfExistBySecretCode(secretCode);
-
-                    break;
-                default:
-                    Console.WriteLine("please enter only 1 or 2");
-                    EnterCheck();
-                    break;
-            }
-            return checkSecretsode || checkName;//גישה אושרה אחד מהנתונים תקין
+            return checkSecretsode;
 
         }
-        public void CreateNewReporterM()//2
+        public Person CreateNewReporterM()//2
         {
             Console.WriteLine("Lets create new Repoerter");
             Console.WriteLine("enter your first name");
             string firstname = Console.ReadLine();
             Console.WriteLine("enter your last name");
             string lastname = Console.ReadLine();
-          
-            string randomSecretCode1 = RandomSecretCode();
-            
-           
 
-            people_method.CreatPerson(firstname, lastname, randomSecretCode1, "reporter");
+            string randomSecretCode1 = RandomSecretCode();
+
 
             Console.WriteLine("--------------\n");
             Console.WriteLine("Created successfully \n These are your details, keep them safe");
             Console.WriteLine($"FirstName: {firstname}\n LastName: {lastname}\n SecretCode: {randomSecretCode1}\n Type: reporter");
             Console.WriteLine("--------------\n");
 
+
+
+            return people_method.CreatPerson(firstname, lastname, randomSecretCode1, "reporter");
+
+
+
         }
-        public void CreateNewTargetM()//3
+        public Person CreateNewTargetM()//3
         {
 
             Console.WriteLine("enter his first name");
@@ -150,40 +152,33 @@ namespace DataBase
             string lastname = Console.ReadLine();
 
             string randomSecretCode = RandomSecretCode();
-            people_method.CreatPerson(firstname, lastname, randomSecretCode, "target");
+
 
             Console.WriteLine("--------------\n");
             Console.WriteLine("Created successfully \n These are your details, keep them safe");
             Console.WriteLine($"FirstName: {firstname}\n LastName: {lastname}\n SecretCode: {randomSecretCode}\n Type: target");
             Console.WriteLine("--------------\n");
+
+            return people_method.CreatPerson(firstname, lastname, randomSecretCode, "target");
         }
-        public void CreateNewIntelM()//4
+        public void CreateNewIntelM(Person Mainreporter)//4
         {
-            int targetId;
+
+
             Console.WriteLine("enter your target secret code");
             string secretcodeTar = Console.ReadLine();
 
-            Person target1 = people_method.GetPersonBySecretcode(secretcodeTar);
-            Person target2;
-            if (target1 == null)
+            Person target = people_method.GetPersonBySecretcode(secretcodeTar);
+
+            if (target == null)
             {
                 Console.WriteLine("secret code desent exisit letes create new taarget ");
-                CreateNewTargetM();
+                target = CreateNewTargetM();
 
-                Console.WriteLine("enter target secret code ");
-                secretcodeTar = Console.ReadLine();
 
-                target2 = people_method.GetPersonBySecretcode(secretcodeTar);
-
-                target1 = target2;
 
             }
 
-            
-            Console.WriteLine("reporter pleas enter your secret code to creat report");
-            string secretCodeRep = Console.ReadLine();
-
-            Person reporter = people_method.GetPersonBySecretcode(secretCodeRep);
 
             Console.WriteLine("enter yout informtion");
 
@@ -191,13 +186,13 @@ namespace DataBase
 
 
 
-            people_method.UpdatePersonReportsOrMention(reporter, "r");
-            people_method.UpdatePersonReportsOrMention(target1, "t");
+            people_method.UpdatePersonReportsOrMention(Mainreporter, "r");
+            people_method.UpdatePersonReportsOrMention(target, "t");
 
-            CheckUpdateType(reporter, target1, TextReport);
+            CheckUpdateType(Mainreporter, target, TextReport);
 
 
-            intel_report.CreateNewIntel(reporter, target1, TextReport);
+            intel_report.CreateNewIntel(Mainreporter, target, TextReport);
         }
         public void FindAllReportsByIDM()//5
         {
@@ -215,7 +210,7 @@ namespace DataBase
             }
         }
 
-        public void CheckUpdateType(Person reporter, Person target,string textreport)//6
+        public void CheckUpdateType(Person reporter, Person target, string textreport)//6
         {
             if (reporter.Id == target.Id)
             {
@@ -232,7 +227,7 @@ namespace DataBase
             }
 
         }
-        public void checkUpdatereporter(Person reporter,string txt)
+        public void checkUpdatereporter(Person reporter, string txt)
         {
 
 
@@ -252,9 +247,9 @@ namespace DataBase
                     sum += report.Text.Replace(" ", "").Length;
                 }
                 sum += txt.Length;
-                
-                
-                return sum / (list.Count+1);
+
+
+                return sum / (list.Count + 1);
             }
 
         }//7
@@ -353,7 +348,7 @@ namespace DataBase
                 }
 
             }
-            
+
 
         }
 
