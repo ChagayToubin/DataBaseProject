@@ -17,18 +17,45 @@ namespace DataBase.DATA.DAL
     {
         MySqlConnection Connect = Connection.InitConnection();
 
-        public void CreatPerson(string firstName, string lastName, string secretCode, string type)//1
+        public Person CreatPerson(string firstNamE, string lastNamE, string secretCodE, string typE)//1
         {
+            MySqlDataReader reader;
             try
             {
                 Connection.Open(Connect);
                 var conn = Connect;
 
                 var quary = $"INSERT INTO People (first_name, last_name, secret_code, type, num_reports, num_mentions)" +
-                    $"VALUES ('{firstName}', '{lastName}', '{secretCode}', '{type}', 0, 0)";
-                new MySqlCommand(quary, conn).ExecuteNonQuery();
+                    $"VALUES ('{firstNamE}', '{lastNamE}', '{secretCodE}', '{typE}', 0, 0); select * from People WHERE id =  LAST_INSERT_ID();";
+                var cmd=new MySqlCommand(quary, conn);
 
-                
+                reader = cmd.ExecuteReader();
+                reader.Read();
+
+                int ID = reader.GetInt32("id");
+                string firstName = reader.GetString("first_name");
+                string lastName = reader.GetString("last_name");
+                string secreCode = reader.GetString("secret_code");
+                string type = reader.GetString("type");
+                int namReport = reader.GetInt32("num_reports");
+                int numMentions = reader.GetInt32("num_mentions");
+
+
+                Person a = new Person.Builder().SetFirstName(firstName)
+                .SetId(ID)
+                    .SetLastName(lastName)
+                    .SetSecretCode(secreCode)
+                    .SetType(type)
+                    .SetNumReports(namReport)
+                    .SetNumMentions(numMentions)
+                    .Build();
+
+
+                return a;
+
+
+
+
 
 
             }
@@ -70,37 +97,7 @@ namespace DataBase.DATA.DAL
                 Connection.Close(Connect);
             }
         }
-        public bool CheckIfExistByName(string FirstName, string LastName)//3
-        {
-            Connection.Open(Connect);
-            var conn = Connect;//יצרr את החיבור
-
-            MySqlCommand cmd = null;
-            MySqlDataReader reader = null;
-            try
-            {
-                cmd = new MySqlCommand($"SELECT * FROM People where first_name='" +
-                    $"{FirstName}'and last_name={LastName}", Connect);
-
-                reader = cmd.ExecuteReader();
-
-                return (reader.HasRows);
-
-
-            }
-            catch (Exception ex)
-            {
-                //Console.WriteLine("!@#$%^&*(*&^%$#@");
-
-                return false;
-
-            }
-            finally
-            {
-                Connection.Close(Connect);
-            }
-
-        }
+       
         public Person GetPersonBySecretcode(string secretcode)//4
         {
             Connection.Open(Connect);

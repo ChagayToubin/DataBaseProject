@@ -31,6 +31,7 @@ namespace DataBase
 
             //pp.CheckIfExistByName("eu", "232");
             //menu.SowAllData();
+           
             menu.ShowMainMune();
             //var d = intel_report.FindAllReportsByID(13, "r");
 
