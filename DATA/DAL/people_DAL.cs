@@ -12,12 +12,12 @@ using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 
 namespace DataBase.DATA.DAL
-{
+{//last_inserted_id();
     public class People_DAL
     {
         MySqlConnection Connect = Connection.InitConnection();
 
-        public void CreatPerson(string firstName, string lastName, string secretCode, string type)
+        public void CreatPerson(string firstName, string lastName, string secretCode, string type)//1
         {
             try
             {
@@ -27,6 +27,8 @@ namespace DataBase.DATA.DAL
                 var quary = $"INSERT INTO People (first_name, last_name, secret_code, type, num_reports, num_mentions)" +
                     $"VALUES ('{firstName}', '{lastName}', '{secretCode}', '{type}', 0, 0)";
                 new MySqlCommand(quary, conn).ExecuteNonQuery();
+
+                
 
 
             }
@@ -44,7 +46,7 @@ namespace DataBase.DATA.DAL
 
         }
 
-        public bool CheckIfExistBySecretCode(string secret_code)
+        public bool CheckIfExistBySecretCode(string secret_code)//2
         {
             Connection.Open(Connect);
             var conn = Connect;//יצרr את החיבור
@@ -68,7 +70,7 @@ namespace DataBase.DATA.DAL
                 Connection.Close(Connect);
             }
         }
-        public bool CheckIfExistByName(string FirstName, string LastName)
+        public bool CheckIfExistByName(string FirstName, string LastName)//3
         {
             Connection.Open(Connect);
             var conn = Connect;//יצרr את החיבור
@@ -99,7 +101,7 @@ namespace DataBase.DATA.DAL
             }
 
         }
-        public Person GetPersonBySecretcode(string secretcode)
+        public Person GetPersonBySecretcode(string secretcode)//4
         {
             Connection.Open(Connect);
             MySqlCommand cmd = null;
@@ -136,7 +138,7 @@ namespace DataBase.DATA.DAL
             catch (Exception ex)
             {
                 //Console.WriteLine("!@#$%^&*(*&^%$#@");
-                Console.WriteLine("Error: " + ex.Message);
+              
                 Console.WriteLine("dont found");
                 return null;
 
@@ -147,7 +149,7 @@ namespace DataBase.DATA.DAL
 
             }
         }
-        public void UpdatePersonReportsOrMention(Person person, string sighn)
+        public void UpdatePersonReportsOrMention(Person person, string sighn)//5
         {
 
             try
@@ -166,7 +168,7 @@ namespace DataBase.DATA.DAL
 
                 }
 
-                
+
 
             }
             catch (Exception ex)
@@ -183,17 +185,17 @@ namespace DataBase.DATA.DAL
 
         }
 
-        public void UpdatePersonType(int personId, string newtype)
+        public void UpdatePersonType(int personId, string newtype, string coulmn)//6
         {
             try
             {
                 Connection.Open(Connect);
                 var conn = Connect;
 
-                {
-                    var quary = $"UPDATE people SET type = '{newtype}' WHERE id={personId}";
-                    new MySqlCommand(quary, conn).ExecuteNonQuery();
-                }
+
+                var quary = $"UPDATE people SET `{coulmn}` = '{newtype}' WHERE id={personId}";
+                new MySqlCommand(quary, conn).ExecuteNonQuery();
+
 
 
             }
@@ -207,18 +209,128 @@ namespace DataBase.DATA.DAL
                 Connection.Close(Connect);
             }
         }
-        public string RandomSecretCode()
+        public string GetSecretCodeByname(string firstName, string lastName)//7
         {
-            Random rnd = new Random();
-            string random = "QWERTYUIOP[]ASDFGHJKL;'ZXCVBNM,./zxcvbnmasdfghjkl;'qwertyuiop!@#$%^&*()_+";
-            string RandomleCode = "";
-            for (int i = 0; i < 5; i++)
-            {
+            Connection.Open(Connect);
 
-                RandomleCode += random[rnd.Next(0, random.Length)];
+            MySqlCommand cmd = null;
+            MySqlDataReader reader = null;
+            string secretcode;
+            try
+            {
+               
+                var conn = Connect;
+
+                var quary = $"select * from people where first_name='{firstName}'and last_name='{lastName}'";
+                cmd = new MySqlCommand(quary, conn);
+                
+
+                reader = cmd.ExecuteReader();
+                
+
+                if (reader.Read())
+                {
+                    secretcode = reader.GetString("secret_code");
+                    Console.WriteLine(secretcode);
+                    return secretcode;
+                }
+                else
+                {
+                    Console.WriteLine("Dont found  ");
+
+                    return null; // או כל ערך אחר שמתאים לך
+                }
+
+
+                return secretcode;
+
+                string h =Console.ReadLine();
+
             }
-            return RandomleCode;
+            catch(Exception ex)
+            {
+                
+                Console.WriteLine(ex);
+                return "";
+            }
+            finally
+            {
+                Connection.Close(Connect);
+            }
         }
+        public List<Person> ShowIPeopleByType(string typePerson)
+        {
+            Connection.Open(Connect);
+            
+            var conn = Connect;
+
+            string quary;
+
+            List<Person> list = new List<Person>();
+            MySqlCommand cmd = null;
+            MySqlDataReader reader = null;
+            try
+            {
+                if (typePerson == "danger")
+                {
+                    quary= $"select * from people where type_danger = 'danger'";
+                }
+                else
+                {
+                    quary = $"select * from people where type = '{typePerson}'";
+                    
+                }
+                cmd = new MySqlCommand(quary, conn);
+
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    int ID = reader.GetInt32("id");
+                    string firstName = reader.GetString("first_name");
+                    string lastName = reader.GetString("last_name");
+                    string secreCode = reader.GetString("secret_code");
+                    string type = reader.GetString("type");
+                    int namReport = reader.GetInt32("num_reports");
+                    int numMentions = reader.GetInt32("num_mentions");
+
+
+                    Person a = new Person.Builder().SetFirstName(firstName)
+                    .SetId(ID)
+                        .SetLastName(lastName)
+                        .SetSecretCode(secreCode)
+                        .SetType(type)
+                        .SetNumReports(namReport)
+                        .SetNumMentions(numMentions)
+                        .Build();
+                    list.Add(a);
+                }
+                if (list.Count == 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    return list;
+
+                }
+                   
+
+            }
+            catch(Exception ex)
+            {
+                return null;
+                Console.WriteLine(ex);
+            }
+            finally
+            {
+                Connection.Close(conn);
+            }
+
+        }
+
+
+
 
 
 
